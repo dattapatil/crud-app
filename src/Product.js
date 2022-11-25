@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import axios from 'axios'; 
 
 function Product(){
@@ -23,10 +23,24 @@ const [product, setProduct] = useState(
 );
 const [products, setProducts] = useState([]);
 
+const form = useRef();
+
 let getProduct = async ()=>{
     const response = await axios.get("http://localhost:8089/api/v1.0.0/product/list");
     console.log(response);
     setProducts(response.data.products)
+}
+
+const renderTableHead = ()=>{    
+    const tableHeadKey = Object.keys(product);     
+    const index = tableHeadKey.indexOf("category")
+    tableHeadKey.splice(index, 1);
+    let listofTh = tableHeadKey.map(
+        (ths)=>{
+            return <th>{ths}</th> 
+        }
+    );
+    return listofTh;
 }
 
 const renderTable = ()=>{
@@ -59,6 +73,7 @@ const formSubmit = async (event) =>{
     console.log(product);
     console.log(response);
     if(response.data.success){
+        form.current.reset();
         getProduct();
     }
 }
@@ -74,7 +89,7 @@ const deleteProduct = async (id)=>{
 return(
     <div>
      <h1 className='mb-3'>Add Product</h1>
-     <form >    
+     <form ref={form}>    
                 <div className="row">
                 <div className="col-md-10">
                 <div className="mb-2 row">
@@ -121,18 +136,23 @@ return(
             <hr></hr>
             <table className='table table-striped'>
                 <thead>
-                <tr>
+                 <tr> 
+                  {renderTableHead()} 
+                 <th colSpan="2">Oprations</th>
+                 </tr> 
+                 
+                {/* <tr>
                     <th>name</th>
                     <th>description</th>
                     <th>richDescription</th>
                     <th>image</th>
                     <th>brand</th>
                     <th>price</th>
-                    {/* <th>category</th> */}
+                    <th>category</th>
                     <th>countInStock</th>
                     <th>rating</th>
                     <th colSpan="2">Oprations</th>
-                </tr>
+                </tr> */}
                 </thead>
                 <tbody>
                     {renderTable()}
